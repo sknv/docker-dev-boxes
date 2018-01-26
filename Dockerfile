@@ -24,7 +24,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
 # ENV GOROOT=/usr/local/go GOPATH=/home/docker/code
 # ENV PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-# RUN GO_VERSION=1.9.2 \
+# RUN GO_VERSION=1.9.3 \
 # && curl -sL https://storage.googleapis.com/golang/go"$GO_VERSION".linux-amd64.tar.gz | tar -xz -C /usr/local
 
 ##
