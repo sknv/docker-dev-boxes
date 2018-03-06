@@ -3,9 +3,9 @@ FROM ubuntu:16.04
 # TODO: Uncomment required dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-transport-https ca-certificates curl locales tzdata \
-  # software-properties-common \ # Required for Java, MariaDB, PHP, Python.
-  # build-essential gettext \ # Required for Python.
-  # git \ Required for Ruby.
+  # software-properties-common \ # Required for Java, MariaDB, PHP.
+  # build-essential gettext software-properties-common \ # Required for Python.
+  # build-essential git libssl-dev libreadline-dev \ # Required for Ruby.
 && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
 # Generate required locales.
 && locale-gen en_US.UTF-8 ru_RU.UTF-8 \
@@ -24,7 +24,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
 # ENV GOROOT=/usr/local/go GOPATH=/home/docker/code
 # ENV PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-# RUN GO_VERSION=1.9.3 \
+# RUN GO_VERSION=1.10 \
 # && curl -sL https://storage.googleapis.com/golang/go"$GO_VERSION".linux-amd64.tar.gz | tar -xz -C /usr/local
 
 ##
@@ -77,14 +77,10 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # Install NodeJS and set Npm permissions.
 ##
 
-# ENV PATH=$PATH:~/.npm-global/bin
-# RUN NODE_VERSION=8.x \
+# RUN NODE_VERSION=9.x \
 # && curl -sL https://deb.nodesource.com/setup_"$NODE_VERSION" | bash - \
 # && apt-get update && apt-get install -y --no-install-recommends nodejs \
 # && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
-# # Create a folder for Npm packages.
-# && mkdir ~/.npm-global \
-# && npm config set prefix '~/.npm-global' \
 # # Update Npm.
 # && npm install --global npm
 

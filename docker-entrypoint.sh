@@ -5,4 +5,4 @@
 
 /bin/bash # Default cmd.
 # mongod --dbpath "$MONGODATA" # Start Mongod.
-# su - postgres -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/postgres -D $PGDATA"
+# su - postgres -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/postgres -D $PGDATA" # Start PostgreSQL.
