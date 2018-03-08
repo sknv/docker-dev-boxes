@@ -1,11 +1,13 @@
 FROM ubuntu:16.04
 
 # TODO: Uncomment required dependencies.
+
+# Install dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-transport-https ca-certificates curl locales tzdata \
   # software-properties-common \ # Required for Java, MariaDB, PHP.
   # build-essential gettext software-properties-common \ # Required for Python.
-  # build-essential git libssl-dev libreadline-dev \ # Required for Ruby.
+  # build-essential git libreadline-dev libssl-dev zlib1g-dev \ # Required for Ruby.
 && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
 # Generate required locales.
 && locale-gen en_US.UTF-8 ru_RU.UTF-8 \
@@ -48,7 +50,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # # Install MariaDB.
 # && apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 \
 # && add-apt-repository "deb [arch=amd64,i386,ppc64el] https://mirror.mephi.ru/mariadb/repo/$MARIADB_VERSION/ubuntu xenial main" \
-# && apt-get update && apt-get install -y --no-install-recommends mariadb-server \
+# && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mariadb-server \
 # && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
 ##
@@ -138,22 +140,17 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # && pip3 install virtualenv
 
 ##
-# Install Ruby.
+# Install Ruby, rbenv and ruby-build.
 ##
 
-# ENV PATH=$PATH:~/.rbenv/bin:~/.rbenv/plugins/ruby-build/bin
-# RUN RUBY_VERSION=2.5.0 \
-# # Install rbenv.
-# && git clone https://github.com/rbenv/rbenv.git ~/.rbenv \
-# && echo 'eval "$(rbenv init -)"' | tee -a ~/.bashrc \
-# # Install ruby-build.
-# && git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
-# # Install ruby.
-# && rbenv install "$RUBY_VERSION" && rbenv global "$RUBY_VERSION" \
-# # Disable ruby docs.
-# && echo 'gem: --no-document' | tee -a ~/.gemrc \
-# # Install Bundler.
-# && gem install bundler && rbenv rehash
+ENV RUBY_VERSION=2.5.0 PATH=$PATH:~/.rbenv/bin:~/.rbenv/plugins/ruby-build/bin
+RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv \
+&& git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
+&& echo 'eval "$(rbenv init -)"' | tee -a ~/.bashrc | tee -a ~/.profile \
+# Disable ruby docs.
+&& echo 'gem: --no-document' | tee -a ~/.gemrc
+# Install ruby and Bundler.
+RUN /bin/bash -cl "rbenv install $RUBY_VERSION && rbenv global $RUBY_VERSION && gem install bundler && rbenv rehash"
 
 # Set working directory.
 WORKDIR /home/docker
