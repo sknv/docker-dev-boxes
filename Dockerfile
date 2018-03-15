@@ -4,9 +4,8 @@ FROM ubuntu:16.04
 
 # Install dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  apt-transport-https ca-certificates curl locales tzdata \
-  # software-properties-common \ # Required for Java, MariaDB, PHP.
-  # build-essential gettext software-properties-common \ # Required for Python.
+  apt-transport-https ca-certificates curl locales mc software-properties-common tzdata \
+  # build-essential gettext \ # Required for Python.
   # build-essential git libreadline-dev libssl-dev zlib1g-dev \ # Required for Ruby.
 && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
 # Generate required locales.
@@ -79,7 +78,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # Install NodeJS and set Npm permissions.
 ##
 
-# RUN NODE_VERSION=9.x \
+# RUN NODE_VERSION=8.x \
 # && curl -sL https://deb.nodesource.com/setup_"$NODE_VERSION" | bash - \
 # && apt-get update && apt-get install -y --no-install-recommends nodejs \
 # && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
@@ -103,24 +102,21 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # Install PostgreSQL.
 ##
 
-# ENV POSTGRESQL_VERSION=10 PGDATA=/data/postgresql
-# RUN echo 'deb https://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' | tee -a /etc/apt/sources.list.d/pgdg.list \
+# RUN POSTGRESQL_VERSION=10 \
+# && echo 'deb https://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' | tee -a /etc/apt/sources.list.d/pgdg.list \
 # && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
 # && apt-get update && apt-get install -y --no-install-recommends \
 #   postgresql-"$POSTGRESQL_VERSION" postgresql-contrib-"$POSTGRESQL_VERSION" libpq-dev \
 # && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
-# # Create a folder for databases.
-# && mkdir -p "$PGDATA" && chown postgres:postgres "$PGDATA" \
-# && su - postgres -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/initdb -D $PGDATA" \
-# # Start postgres for the current session and wait to ensure the service is running.
-# && su - postgres -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/pg_ctl -D $PGDATA -l /var/log/postgresql/postgresql.log start" && sleep 10 \
+# # Start PostgreSQL for the current session and wait to ensure the service is running.
+# && service postgresql start && sleep 10 \
 # # Set 'postgres' user password (USE FOR DEV MODE ONLY!).
 # && su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD 'docker';\"" \
 # # Allow external connections for PostgreSQL (USE FOR DEV MODE ONLY!).
 # && echo 'host all all all md5' | tee -a /etc/postgresql/"$POSTGRESQL_VERSION"/main/pg_hba.conf \
 # && sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /etc/postgresql/"$POSTGRESQL_VERSION"/main/postgresql.conf \
 # # Stop the PostgreSQL server.
-# && su - postgres -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/pg_ctl -D $PGDATA stop"
+# && service postgresql stop
 
 ##
 # Install Python3.
@@ -133,11 +129,8 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
 # # Set Python3 aliases.
 # && echo "alias python3=python$PYTHON_VERSION" | tee -a ~/.bash_aliases \
-# && source ~/.bash_aliases \
 # # Install Pip3 (autoset Pip3 aliases).
-# && curl -sL https://bootstrap.pypa.io/get-pip.py | python"$PYTHON_VERSION" \
-# # Install virtualenv.
-# && pip3 install virtualenv
+# && curl -sL https://bootstrap.pypa.io/get-pip.py | python"$PYTHON_VERSION"
 
 ##
 # Install Ruby, rbenv and ruby-build.
