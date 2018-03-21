@@ -4,5 +4,5 @@
 # TODO: Uncomment required entry point or use a default one.
 
 /bin/bash # Default cmd.
-# mongod --dbpath "$MONGODATA" # Start Mongod.
-service postgresql start && /bin/bash # Start PostgreSQL.
+# mongod --fork --dbpath "$MONGODATA" --logpath "$MONGOLOG" && /bin/bash # Start Mongod.
+# su -l -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/pg_ctl -D $PGDATA -l $PGLOG start" postgres && /bin/bash # Start PostgreSQL.

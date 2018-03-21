@@ -24,7 +24,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 ##
 
 # ENV GOROOT=/usr/local/go GOPATH=/home/docker/code
-# ENV PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+# ENV PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 # RUN GO_VERSION=1.10 \
 # && curl -sL https://storage.googleapis.com/golang/go"$GO_VERSION".linux-amd64.tar.gz | tar -xz -C /usr/local
 
@@ -56,7 +56,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # Install MongoDB.
 ##
 
-# ENV MONGODATA=/data/mongodb
+# ENV MONGODATA=/data/mongodb MONGOLOG=/var/log/mongodb/mongodb.log
 # RUN MONGO_VERSION=3.6 \
 # && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5 \
 # && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/$MONGO_VERSION multiverse" | tee /etc/apt/sources.list.d/mongodb-org-"$MONGO_VERSION".list \
@@ -65,7 +65,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # # Create a folder for databases.
 # && mkdir -p "$MONGODATA" && chown mongodb:mongodb "$MONGODATA" \
 # # Start mongod for the current session and wait to ensure the service is running.
-# && mongod --fork --dbpath "$MONGODATA" --logpath /var/log/mongodb/mongodb.log && sleep 10 \
+# && mongod --fork --dbpath "$MONGODATA" --logpath "$MONGOLOG" && sleep 10 \
 # # Enable Mongo authentication (USE FOR DEV MODE ONLY!).
 # && mongo admin --eval "db.createUser({ user: 'docker', pwd: 'docker', roles: [{ role: 'userAdminAnyDatabase', db: 'admin' }] })" \
 # && sed -i 's/#security:/security:\n  authorization: enabled/g' /etc/mongod.conf \
@@ -75,7 +75,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # && mongod --shutdown --dbpath "$MONGODATA"
 
 ##
-# Install NodeJS and set Npm permissions.
+# Install NodeJS.
 ##
 
 # RUN NODE_VERSION=8.x \
@@ -102,21 +102,24 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # Install PostgreSQL.
 ##
 
-# RUN POSTGRESQL_VERSION=10 \
-# && echo 'deb https://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' | tee -a /etc/apt/sources.list.d/pgdg.list \
+# ENV POSTGRESQL_VERSION=10 PGDATA=/data/postgresql PGLOG=/var/log/postgresql/postgresql.log
+# RUN echo 'deb https://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main' | tee -a /etc/apt/sources.list.d/pgdg.list \
 # && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
 # && apt-get update && apt-get install -y --no-install-recommends \
 #   postgresql-"$POSTGRESQL_VERSION" postgresql-contrib-"$POSTGRESQL_VERSION" libpq-dev \
 # && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
+# # Create a folder for databases.
+# && mkdir -p "$PGDATA" && chown postgres:postgres "$PGDATA" \
+# && su -l -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/initdb -D $PGDATA" postgres \
 # # Start PostgreSQL for the current session and wait to ensure the service is running.
-# && service postgresql start && sleep 10 \
+# && su -l -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/pg_ctl -D $PGDATA -l $PGLOG start" postgres && sleep 10 \
 # # Set 'postgres' user password (USE FOR DEV MODE ONLY!).
-# && su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD 'docker';\"" \
+# && su -l -c "psql -c \"ALTER USER postgres WITH PASSWORD 'docker';\"" postgres \
 # # Allow external connections for PostgreSQL (USE FOR DEV MODE ONLY!).
 # && echo 'host all all all md5' | tee -a /etc/postgresql/"$POSTGRESQL_VERSION"/main/pg_hba.conf \
 # && sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /etc/postgresql/"$POSTGRESQL_VERSION"/main/postgresql.conf \
 # # Stop the PostgreSQL server.
-# && service postgresql stop
+# && su -l -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/pg_ctl -D $PGDATA stop" postgres
 
 ##
 # Install Python3.
@@ -136,14 +139,14 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # Install Ruby, rbenv and ruby-build.
 ##
 
-ENV RUBY_VERSION=2.5.0 PATH=$PATH:~/.rbenv/bin:~/.rbenv/plugins/ruby-build/bin
-RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv \
-&& git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
-&& echo 'eval "$(rbenv init -)"' | tee -a ~/.bashrc | tee -a ~/.profile \
-# Disable ruby docs.
-&& echo 'gem: --no-document' | tee -a ~/.gemrc
-# Install ruby and Bundler.
-RUN /bin/bash -cl "rbenv install $RUBY_VERSION && rbenv global $RUBY_VERSION && gem install bundler && rbenv rehash"
+# ENV RUBY_VERSION=2.5.0 PATH="$PATH:~/.rbenv/bin:~/.rbenv/plugins/ruby-build/bin"
+# RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv \
+# && git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
+# && echo 'eval "$(rbenv init -)"' | tee -a ~/.bashrc | tee -a ~/.profile \
+# # Disable ruby docs.
+# && echo 'gem: --no-document' | tee -a ~/.gemrc
+# # Install ruby and Bundler.
+# RUN /bin/bash -l -c "rbenv install $RUBY_VERSION && rbenv global $RUBY_VERSION && gem install bundler && rbenv rehash"
 
 # Set working directory.
 WORKDIR /home/docker
