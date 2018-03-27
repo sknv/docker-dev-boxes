@@ -4,7 +4,7 @@ FROM ubuntu:16.04
 
 # Install dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  apt-transport-https ca-certificates curl locales tzdata \
+  apt-transport-https ca-certificates curl language-pack-ru tzdata \
 # Additional software.
   # mc \
 # Required for Java, MariaDB, PHP.
@@ -14,14 +14,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Required for Ruby.
   # build-essential git libreadline-dev libssl-dev zlib1g-dev \
 && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
-# Generate required locales.
-&& locale-gen en_US.UTF-8 ru_RU.UTF-8 \
 # Set the timezone.
 && echo Europe/Moscow > /etc/timezone \
 && ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 
 # Set locales for Docker image.
-ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+ENV LANG=ru_RU.UTF-8 LANGUAGE=ru_RU:ru LC_ALL=ru_RU.UTF-8
 
 # TODO: Uncomment required software.
 
@@ -116,7 +114,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 # && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
 # # Create a folder for databases.
 # && mkdir -p "$PGDATA" && chown postgres:postgres "$PGDATA" \
-# && su -l -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/initdb -D $PGDATA" postgres \
+# && su -l -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/initdb -D $PGDATA --locale ru_RU.utf8" postgres \
 # # Start PostgreSQL for the current session and wait to ensure the service is running.
 # && su -l -c "/usr/lib/postgresql/$POSTGRESQL_VERSION/bin/pg_ctl -D $PGDATA -l $PGLOG start" postgres && sleep 10 \
 # # Set 'postgres' user password (USE FOR DEV MODE ONLY!).
