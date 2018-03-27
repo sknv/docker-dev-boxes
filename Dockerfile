@@ -4,9 +4,15 @@ FROM ubuntu:16.04
 
 # Install dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  apt-transport-https ca-certificates curl locales mc software-properties-common tzdata \
-  # build-essential gettext \ # Required for Python.
-  # build-essential git libreadline-dev libssl-dev zlib1g-dev \ # Required for Ruby.
+  apt-transport-https ca-certificates curl locales tzdata \
+# Additional software.
+  # mc \
+# Required for Java, MariaDB, PHP.
+  # software-properties-common \
+# Required for Python.
+  # build-essential gettext software-properties-common \
+# Required for Ruby.
+  # build-essential git libreadline-dev libssl-dev zlib1g-dev \
 && apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
 # Generate required locales.
 && locale-gen en_US.UTF-8 ru_RU.UTF-8 \
