@@ -4,7 +4,7 @@ FROM ubuntu:16.04
 
 # Install dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  apt-transport-https ca-certificates curl language-pack-ru tzdata \
+  apt-transport-https ca-certificates curl language-pack-en language-pack-ru tzdata \
 # Additional software.
   # mc \
 # Required for Java, MariaDB, PHP.
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 && ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 
 # Set locales for Docker image.
-ENV LANG=ru_RU.UTF-8 LANGUAGE=ru_RU:ru LC_ALL=ru_RU.UTF-8
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 
 # TODO: Uncomment required software.
 
